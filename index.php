@@ -41,9 +41,24 @@ if (isset($_GET['pass_length'])) {
         }
 
         if (in_array(true, $use_characters)) {
-            $password = generate_password($pass_length, $use_characters, $similar_characters);
-            $alert_message = "La password generata é: $password.";
-            $alert_color = 'success';
+            // no characters repetition allowed
+            if (!$use_characters[0] && $use_characters[1] && $use_characters[2] && $pass_length > 18 && !$similar_characters) {
+                // only numbers and symbols included (with length < 18)
+                $alert_message = 'Hai selezionato solo numeri e simboli senza ripetizione. La password può essere lunga massimo 18 caratteri.';
+                $alert_color = 'danger';
+            } else if (!$use_characters[0] && $use_characters[1] && !$use_characters[2] && $pass_length > 10 && !$similar_characters) {
+                // only numbers included (with length < 10)
+                $alert_message = 'Hai selezionato solo numeri senza ripetizione. La password può essere lunga massimo 10 caratteri.';
+                $alert_color = 'danger';
+            } else if (!$use_characters[0] && !$use_characters[1] && $use_characters[2] && $pass_length > 8 && !$similar_characters) {
+                // only symbols included (with length < 8)
+                $alert_message = 'Hai selezionato solo simboli senza ripetizione. La password può essere lunga massimo 8 caratteri.';
+                $alert_color = 'danger';
+            } else {
+                $password = generate_password($pass_length, $use_characters, $similar_characters);
+                $alert_message = "La password generata é: $password.";
+                $alert_color = 'success';
+            }
         } else {
             $alert_message = 'La password deve essere composta almeno singolarmente da lettere, numeri o simboli.';
             $alert_color = 'danger';
@@ -103,6 +118,11 @@ if (isset($_GET['pass_length'])) {
                             <div class="form-radio">
                                 <input class="form-check-input" type="radio" name="similar_characters" id="similar_characters" value="0">
                                 <span>No</span>
+                                <!--
+                                    Notare che i numeri possibili sono 10 mentre i simboli sono 8.
+                                    Se la lunghezza è 15 ma si seleziona solo numeri, la password generata sarà un ordine randomico di 10 numeri.
+                                    Stessa cosa per i simboli.
+                                -->
                             </div>
                         </div>
 
