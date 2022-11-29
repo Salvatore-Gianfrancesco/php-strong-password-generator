@@ -59,3 +59,49 @@ function generate_chars($use_characters)
         }
     }
 }
+
+function input_check($pass_length, $use_characters, $similar_characters)
+{
+    if ($pass_length < 5 || $pass_length > 20) {
+        $alert_message = [
+            'message' => 'La password deve essere lunga dai 5 ai 20 caratteri.',
+            'color' => 'danger'
+        ];
+    } else {
+        if (in_array(true, $use_characters)) {
+            if (!$use_characters[0] && $use_characters[1] && $use_characters[2] && $pass_length > 18 && !$similar_characters) {
+                // only numbers and symbols included (with length < 18)
+                $alert_message = [
+                    'message' => 'Hai selezionato solo numeri e simboli senza ripetizione. La password può essere lunga massimo 18 caratteri.',
+                    'color' => 'danger'
+                ];
+            } else if (!$use_characters[0] && $use_characters[1] && !$use_characters[2] && $pass_length > 10 && !$similar_characters) {
+                // only numbers included (with length < 10)
+                $alert_message = [
+                    'message' => 'Hai selezionato solo numeri senza ripetizione. La password può essere lunga massimo 10 caratteri.',
+                    'color' => 'danger'
+                ];
+            } else if (!$use_characters[0] && !$use_characters[1] && $use_characters[2] && $pass_length > 8 && !$similar_characters) {
+                // only symbols included (with length < 8)
+                $alert_message = [
+                    'message' => 'Hai selezionato solo simboli senza ripetizione. La password può essere lunga massimo 8 caratteri.',
+                    'color' => 'danger'
+                ];
+            } else {
+                $password = generate_password($pass_length, $use_characters, $similar_characters);
+
+                $alert_message = [
+                    'message' => "La password generata di $pass_length é: $password.",
+                    'color' => 'success'
+                ];
+            }
+        } else {
+            $alert_message = [
+                'message' => 'La password deve essere composta almeno singolarmente da lettere, numeri o simboli.',
+                'color' => 'danger'
+            ];
+        }
+    }
+
+    return $alert_message;
+}
