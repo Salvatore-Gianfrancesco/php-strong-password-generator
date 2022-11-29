@@ -10,15 +10,52 @@ if (isset($_GET['pass_length'])) {
         $alert_message = 'La password deve essere lunga dai 5 ai 20 caratteri.';
         $alert_color = 'danger';
     } else {
-        $password = generate_password($pass_length);
-        $alert_message = "La password generata di $pass_length caratteri é: $password.";
-        $alert_color = 'success';
+        $use_characters = [];
+
+        /* check if letters are included */
+        if (isset($_GET['use_letters']) && $_GET['use_letters'] == 'on') {
+            array_push($use_characters, true);
+        } else {
+            array_push($use_characters, false);
+        }
+
+        /* check if numbers are included */
+        if (isset($_GET['use_numbers']) && $_GET['use_numbers'] == 'on') {
+            array_push($use_characters, true);
+        } else {
+            array_push($use_characters, false);
+        }
+
+        /* check if symbols are included */
+        if (isset($_GET['use_symbols']) && $_GET['use_symbols'] == 'on') {
+            array_push($use_characters, true);
+        } else {
+            array_push($use_characters, false);
+        }
+
+        /* check if characters could be repeated */
+        if (isset($_GET['similar_characters']) && $_GET['similar_characters'] == '1') {
+            $similar_characters = true;
+        } else {
+            $similar_characters = false;
+        }
+
+        if (in_array(true, $use_characters)) {
+            $password = generate_password($pass_length, $use_characters, $similar_characters);
+            $alert_message = "La password generata é: $password.";
+            $alert_color = 'success';
+        } else {
+            $alert_message = 'La password deve essere composta almeno singolarmente da lettere, numeri o simboli.';
+            $alert_color = 'danger';
+        }
     }
     // var_dump($pass_length);
 } else {
     $alert_message = 'Nessun parametro valido inserito.';
     $alert_color = 'info';
 }
+
+// var_dump($use_characters, $similar_characters);
 
 ?>
 
@@ -47,6 +84,51 @@ if (isset($_GET['pass_length'])) {
                 <div class="d-flex p-3 fs-5">
                     <label for="pass_length" class="w-50">Lunghezza password:</label>
                     <input type="number" name="pass_length" id="pass_length" class="w-25 rounded-2">
+                </div>
+
+
+                <div class="d-flex p-3 fs-5">
+                    <label for="similar_characters" class="w-50">Consenti ripetizioni di uno o più caratteri:</label>
+
+                    <div>
+                        <!-- radio -->
+                        <div class="mb-3">
+                            <!-- radio true -->
+                            <div class="form-radio">
+                                <input class="form-check-input" type="radio" name="similar_characters" id="similar_characters" checked value="1">
+                                <span>Sì</span>
+                            </div>
+
+                            <!-- radio false -->
+                            <div class="form-radio">
+                                <input class="form-check-input" type="radio" name="similar_characters" id="similar_characters" value="0">
+                                <span>No</span>
+                            </div>
+                        </div>
+
+                        <!-- checkboxes -->
+                        <div>
+                            <!-- letters -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_letters" name="use_letters" checked>
+                                <label class="form-check-label" for="use_letters">Lettere</label>
+                            </div>
+
+                            <!-- numbers -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_numbers" name="use_numbers">
+                                <label class="form-check-label" for="use_numbers">Numeri</label>
+                            </div>
+
+                            <!-- symbols -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_symbols" name="use_symbols">
+                                <label class="form-check-label" for="use_symbols">Simboli</label>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
 
                 <div class="p-3">
